@@ -29,6 +29,7 @@ label, input, button {
 
 .navbar-nav {
   display: flex;
+  flex-direction: row !important;
   list-style: none;
   margin: 0;
   padding: 0;
