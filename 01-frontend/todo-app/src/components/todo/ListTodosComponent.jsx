@@ -1,31 +1,44 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from './security/AuthContext'
+import { retrieveAllTodosForUser, deleteTodo } from './api/TodoApiService'
 
 export default function ListTodosComponent() {
 
-    const today = new Date()
+    const authContext = useAuth()
+    const userId = authContext.userId
 
-    const targetDate = new Date(today.getFullYear()+12, today.getMonth(), today.getDate())
-
-    const initialTodos = [
-        {id: 1, description: 'Learn AWS', done: false, targetDate: targetDate},
-        {id: 2, description: 'Learn Full Stack', done: false, targetDate: targetDate},
-        {id: 3, description: 'Learn DevOps', done: false, targetDate: targetDate},
-    ]
-
-    const [todos, setTodos] = useState(initialTodos)
-
+    const [todos, setTodos] = useState([])
     const [message, setMessage] = useState(null)
-
     const navigate = useNavigate()
 
-    function deleteTodo(id) {
-        setTodos(todos.filter(todo => todo.id !== id))
-        setMessage(`Delete of todo with id ${id} successful`)
+    const refreshTodos = useCallback(() => {
+        retrieveAllTodosForUser(userId)
+            .then(response => {
+                setTodos(response.data)
+            })
+            .catch(error => console.error("Error fetching todos:", error))
+    }, [userId])
+
+    useEffect(() => {
+        refreshTodos()
+    }, [refreshTodos])
+
+    function handleDeleteTodo(id) {
+        deleteTodo(userId, id)
+            .then(() => {
+                setMessage(`Delete of todo with id ${id} successful`)
+                refreshTodos()
+            })
+            .catch(error => console.error("Error deleting todo:", error))
     }
 
-    function updateTodo(id) {
+    function handleUpdateTodo(id) {
         navigate(`/todo/${id}`)
+    }
+
+    function addNewTodo() {
+        navigate('/todo/-1')
     }
 
     return (
@@ -36,7 +49,6 @@ export default function ListTodosComponent() {
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Description</th>
                             <th>Is Done?</th>
                             <th>Target Date</th>
@@ -49,12 +61,11 @@ export default function ListTodosComponent() {
                         todos.map(
                             todo => (
                                 <tr key={todo.id}>
-                                    <td>{todo.id}</td>
                                     <td>{todo.description}</td>
-                                    <td>{todo.done.toString()}</td>
-                                    <td>{todo.targetDate.toDateString()}</td>
-                                    <td><button className="btn btn-warning" onClick={() => deleteTodo(todo.id)}>Delete</button></td>
-                                    <td><button className="btn btn-success" onClick={() => updateTodo(todo.id)}>Update</button></td>
+                                    <td>{todo.completed.toString()}</td>
+                                    <td>{todo.dueDate}</td>
+                                    <td><button className="btn btn-warning" onClick={() => handleDeleteTodo(todo.id)}>Delete</button></td>
+                                    <td><button className="btn btn-success" onClick={() => handleUpdateTodo(todo.id)}>Update</button></td>
                                 </tr>
                             )
                         )
@@ -62,6 +73,7 @@ export default function ListTodosComponent() {
                     </tbody>
                 </table>
             </div>
+            <button className="btn btn-success m-3" onClick={addNewTodo}>Add New Todo</button>
         </div>
     )
 }

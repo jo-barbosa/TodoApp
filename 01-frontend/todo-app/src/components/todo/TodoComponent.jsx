@@ -1,19 +1,52 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import moment from 'moment'
+import { useAuth } from './security/AuthContext'
+import { retrieveTodo, createTodo, updateTodo } from './api/TodoApiService'
 
 export default function TodoComponent() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const authContext = useAuth()
+    const userId = authContext.userId
 
-    // Mock initial values based on Todo ID
-    const [description] = useState(id === '-1' ? '' : `Learn AWS (Todo #${id})`)
-    const [targetDate] = useState(moment(new Date()).format('YYYY-MM-DD'))
+    const [description, setDescription] = useState('')
+    const [targetDate, setTargetDate] = useState('')
+    const [completed, setCompleted] = useState(false)
+
+    useEffect(() => {
+        if (id !== '-1') {
+            retrieveTodo(userId, id)
+                .then(response => {
+                    setDescription(response.data.description)
+                    setTargetDate(response.data.dueDate)
+                    setCompleted(response.data.completed)
+                })
+                .catch(error => console.error("Error loading todo:", error))
+        }
+    }, [userId, id])
 
     function onSubmit(values) {
-        console.log('Saved todo details:', { id, ...values })
-        navigate('/todos')
+        const todo = {
+            description: values.description,
+            dueDate: values.targetDate,
+            completed: values.completed
+        }
+
+        if (id === '-1') {
+            createTodo(userId, todo)
+                .then(() => {
+                    navigate('/todos')
+                })
+                .catch(error => console.error("Error creating todo:", error))
+        } else {
+            updateTodo(userId, id, todo)
+                .then(() => {
+                    navigate('/todos')
+                })
+                .catch(error => console.error("Error updating todo:", error))
+        }
     }
 
     function validate(values) {
@@ -37,7 +70,7 @@ export default function TodoComponent() {
             <h1>Enter Todo Details</h1>
             <div className="row justify-content-center mt-4">
                 <Formik
-                    initialValues={{ description, targetDate }}
+                    initialValues={{ description, targetDate, completed }}
                     enableReinitialize={true}
                     onSubmit={onSubmit}
                     validate={validate}
@@ -47,7 +80,7 @@ export default function TodoComponent() {
                             <Form className="w-50 text-start">
                                 <div className="mb-3">
                                     <label htmlFor="id" className="form-label">Todo ID</label>
-                                    <input type="text" id="id" className="form-control" value={id} disabled />
+                                    <input type="text" id="id" className="form-control" value={id === '-1' ? 'New (Auto-generated)' : id} disabled />
                                 </div>
 
                                 <div className="mb-3">
@@ -61,6 +94,13 @@ export default function TodoComponent() {
                                     <Field type="date" className="form-control" name="targetDate" id="targetDate" />
                                     <ErrorMessage name="targetDate" component="div" className="alert alert-warning mt-2" />
                                 </div>
+
+                                {id !== '-1' && (
+                                    <div className="mb-3 form-check">
+                                        <Field type="checkbox" className="form-check-input" name="completed" id="completed" />
+                                        <label htmlFor="completed" className="form-check-label">Is Completed?</label>
+                                    </div>
+                                )}
 
                                 <button className="btn btn-success" type="submit">Save</button>
                             </Form>

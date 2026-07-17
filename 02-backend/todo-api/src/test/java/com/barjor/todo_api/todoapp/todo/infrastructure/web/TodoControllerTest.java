@@ -1,5 +1,7 @@
 package com.barjor.todo_api.todoapp.todo.infrastructure.web;
 
+import com.barjor.todo_api.todoapp.security.JwtConfigurationProperties;
+import com.barjor.todo_api.todoapp.security.SecurityConfiguration;
 import com.barjor.todo_api.todoapp.todo.application.TodoService;
 import com.barjor.todo_api.todoapp.todo.domain.Todo;
 import com.barjor.todo_api.todoapp.todo.domain.exception.TodoNotFoundException;
@@ -9,6 +11,7 @@ import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,12 +21,20 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TodoController.class)
+@WebMvcTest(
+    controllers = TodoController.class,
+    properties = {
+        "jwt.secret-key=dGhpcy1pcy1hLXNlY3JldC1rZXktMzItYnl0ZXMtYW5kLW11c3QtYmUtMjU2LWJpdHMtbG9uZw==",
+        "jwt.expiration-seconds=86400"
+    }
+)
+@Import({SecurityConfiguration.class, JwtConfigurationProperties.class})
 class TodoControllerTest {
 
     @Autowired
@@ -47,6 +58,7 @@ class TodoControllerTest {
         CreateTodoRequest request = new CreateTodoRequest("Buy Milk", dueDate);
 
         mockMvc.perform(post("/api/users/{userId}/todos", userId)
+                        .with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -62,6 +74,7 @@ class TodoControllerTest {
         CreateTodoRequest request = new CreateTodoRequest("", LocalDate.now());
 
         mockMvc.perform(post("/api/users/{userId}/todos", userId)
+                        .with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -76,7 +89,8 @@ class TodoControllerTest {
         when(todoService.getTodoByIdAndUserId(todoId, userId))
                 .thenThrow(new TodoNotOwnedByUserException(todoId, userId));
 
-        mockMvc.perform(get("/api/users/{userId}/todos/{todoId}", userId, todoId))
+        mockMvc.perform(get("/api/users/{userId}/todos/{todoId}", userId, todoId)
+                        .with(jwt()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("Forbidden"))
                 .andExpect(jsonPath("$.message").value("Todo " + todoId + " is not owned by user " + userId));
@@ -90,7 +104,8 @@ class TodoControllerTest {
         when(todoService.getTodoByIdAndUserId(todoId, userId))
                 .thenThrow(new TodoNotFoundException(todoId));
 
-        mockMvc.perform(get("/api/users/{userId}/todos/{todoId}", userId, todoId))
+        mockMvc.perform(get("/api/users/{userId}/todos/{todoId}", userId, todoId)
+                        .with(jwt()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Todo Not Found"));
     }

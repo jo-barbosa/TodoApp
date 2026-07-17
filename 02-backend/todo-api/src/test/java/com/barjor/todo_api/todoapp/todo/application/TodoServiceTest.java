@@ -52,7 +52,7 @@ class TodoServiceTest {
     @Test
     void createTodo_whenUserExists_shouldSaveTodo() {
         UUID userId = UUID.randomUUID();
-        User mockUser = new User(userId, "John", "john@example.com");
+        User mockUser = new User(userId, "John", "john@example.com", "password");
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
         Todo mockSavedTodo = new Todo(UUID.randomUUID(), "Desc", false, LocalDate.now(), userId);
@@ -72,7 +72,7 @@ class TodoServiceTest {
         UUID otherUserId = UUID.randomUUID();
         UUID todoId = UUID.randomUUID();
 
-        User mockUser = new User(userId, "John", "john@example.com");
+        User mockUser = new User(userId, "John", "john@example.com", "password");
         Todo mockTodo = new Todo(todoId, "Desc", false, LocalDate.now(), otherUserId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));

@@ -4,7 +4,7 @@ import { useAuth } from './security/AuthContext'
 
 export default function LoginComponent() {
 
-    const [username, setUsername] = useState('teste')
+    const [email, setEmail] = useState('joao@teste.com')
 
     const [password, setPassword] = useState('')
 
@@ -14,17 +14,17 @@ export default function LoginComponent() {
 
     const authContext = useAuth()
 
-    function handleUsernameChange(event) {
-        setUsername(event.target.value)
+    function handleEmailChange(event) {
+        setEmail(event.target.value)
     }
 
     function handlePasswordChange(event) {
         setPassword(event.target.value)
     }
 
-    function handleSubmit() {
-        if (authContext.login(username, password)) {
-            navigate(`/welcome/${username}`)
+    async function handleSubmit() {
+        if (await authContext.login(email, password)) {
+            navigate(`/welcome/${email}`)
         } else {
             setShowErrorMessage(true)
         }
@@ -35,8 +35,8 @@ export default function LoginComponent() {
             {showErrorMessage && <div className="errorMessage">Authentication Failed. Please check your credentials and try again.</div>}
             <div className="login-form">
                 <div>
-                    <label>Username:</label>
-                    <input type="text" name="username" value={username} onChange={handleUsernameChange}/>
+                    <label>Email:</label>
+                    <input type="text" name="email" value={email} onChange={handleEmailChange}/>
                 </div>
                 <div>
                     <label>Password:</label>

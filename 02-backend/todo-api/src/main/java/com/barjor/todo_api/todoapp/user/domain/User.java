@@ -7,8 +7,9 @@ public final class User {
     private final UUID id;
     private final String name;
     private final String email;
+    private final String password;
 
-    public User(UUID id, String name, String email) {
+    public User(UUID id, String name, String email, String password) {
         this.id = Objects.requireNonNull(id, "User ID cannot be null");
         
         if (name == null || name.isBlank()) {
@@ -23,6 +24,8 @@ public final class User {
             throw new IllegalArgumentException("Invalid email format");
         }
         this.email = email;
+
+        this.password = Objects.requireNonNull(password, "User password cannot be null");
     }
 
     public UUID getId() {
@@ -35,6 +38,10 @@ public final class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     @Override

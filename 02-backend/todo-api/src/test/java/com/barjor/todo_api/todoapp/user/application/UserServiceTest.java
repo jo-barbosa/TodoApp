@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -24,23 +25,28 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     private UserService userService;
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository);
+        userService = new UserService(userRepository, passwordEncoder);
     }
 
     @Test
     void createUser_whenEmailDoesNotExist_shouldSaveUser() {
         when(userRepository.existsByEmail("john@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("password")).thenReturn("hashed-password");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User created = userService.createUser("John Doe", "john@example.com");
+        User created = userService.createUser("John Doe", "john@example.com", "password");
 
         assertThat(created).isNotNull();
         assertThat(created.getName()).isEqualTo("John Doe");
         assertThat(created.getEmail()).isEqualTo("john@example.com");
+        assertThat(created.getPassword()).isEqualTo("hashed-password");
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -48,7 +54,7 @@ class UserServiceTest {
     void createUser_whenEmailExists_shouldThrowEmailAlreadyExistsException() {
         when(userRepository.existsByEmail("john@example.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.createUser("John Doe", "john@example.com"))
+        assertThatThrownBy(() -> userService.createUser("John Doe", "john@example.com", "password"))
                 .isInstanceOf(EmailAlreadyExistsException.class);
 
         verify(userRepository, never()).save(any(User.class));
@@ -57,7 +63,7 @@ class UserServiceTest {
     @Test
     void getUserById_whenUserExists_shouldReturnUser() {
         UUID userId = UUID.randomUUID();
-        User mockUser = new User(userId, "John Doe", "john@example.com");
+        User mockUser = new User(userId, "John Doe", "john@example.com", "hashed-password");
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
         User result = userService.getUserById(userId);

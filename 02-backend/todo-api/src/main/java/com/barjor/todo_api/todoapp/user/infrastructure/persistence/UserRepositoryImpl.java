@@ -42,11 +42,17 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaUserRepository.existsByEmail(email);
     }
 
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return jpaUserRepository.findByEmail(email)
+                .map(this::toDomain);
+    }
+
     private UserEntity toEntity(User user) {
-        return new UserEntity(user.getId(), user.getName(), user.getEmail());
+        return new UserEntity(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 
     private User toDomain(UserEntity entity) {
-        return new User(entity.getId(), entity.getName(), entity.getEmail());
+        return new User(entity.getId(), entity.getName(), entity.getEmail(), entity.getPassword());
     }
 }

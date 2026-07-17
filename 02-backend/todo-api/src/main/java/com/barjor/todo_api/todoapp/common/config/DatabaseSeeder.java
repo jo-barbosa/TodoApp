@@ -30,8 +30,8 @@ public class DatabaseSeeder implements CommandLineRunner {
         log.info("--------------------------------------------------");
         log.info("BOOTSTRAP PROFILE DETECTED: Seeding mock database...");
 
-        User user1 = userService.createUser("João Barbosa", "joao@example.com");
-        User user2 = userService.createUser("Maria Silva", "maria@example.com");
+        User user1 = userService.createUser("João Barbosa", "joao@teste.com", "dummy");
+        User user2 = userService.createUser("Maria Silva", "maria@teste.com", "dummy");
 
         log.info("Mock Users Seeded successfully:");
         log.info("User 1: {} | ID: {} | Email: {}", user1.getName(), user1.getId(), user1.getEmail());
