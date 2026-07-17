@@ -50,7 +50,6 @@ public class TodoRepositoryImpl implements TodoRepository {
     private TodoEntity toEntity(Todo todo) {
         return new TodoEntity(
                 todo.getId(),
-                todo.getTitle(),
                 todo.getDescription(),
                 todo.isCompleted(),
                 todo.getDueDate(),
@@ -61,7 +60,6 @@ public class TodoRepositoryImpl implements TodoRepository {
     private Todo toDomain(TodoEntity entity) {
         return new Todo(
                 entity.getId(),
-                entity.getTitle(),
                 entity.getDescription(),
                 entity.isCompleted(),
                 entity.getDueDate(),

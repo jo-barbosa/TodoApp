@@ -41,25 +41,25 @@ class TodoControllerTest {
         UUID todoId = UUID.randomUUID();
         LocalDate dueDate = LocalDate.now();
 
-        Todo mockTodo = new Todo(todoId, "Buy Milk", "2 cartons", false, dueDate, userId);
-        when(todoService.createTodo(any(UUID.class), anyString(), any(), any())).thenReturn(mockTodo);
+        Todo mockTodo = new Todo(todoId, "Buy Milk", false, dueDate, userId);
+        when(todoService.createTodo(any(UUID.class), anyString(), any())).thenReturn(mockTodo);
 
-        CreateTodoRequest request = new CreateTodoRequest("Buy Milk", "2 cartons", dueDate);
+        CreateTodoRequest request = new CreateTodoRequest("Buy Milk", dueDate);
 
         mockMvc.perform(post("/api/users/{userId}/todos", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(todoId.toString()))
-                .andExpect(jsonPath("$.title").value("Buy Milk"))
+                .andExpect(jsonPath("$.description").value("Buy Milk"))
                 .andExpect(jsonPath("$.completed").value(false))
                 .andExpect(jsonPath("$.userId").value(userId.toString()));
     }
 
     @Test
-    void createTodo_withBlankTitle_shouldReturnBadRequest() throws Exception {
+    void createTodo_withBlankDescription_shouldReturnBadRequest() throws Exception {
         UUID userId = UUID.randomUUID();
-        CreateTodoRequest request = new CreateTodoRequest("", "Desc", LocalDate.now());
+        CreateTodoRequest request = new CreateTodoRequest("", LocalDate.now());
 
         mockMvc.perform(post("/api/users/{userId}/todos", userId)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -16,11 +16,10 @@ class TodoTest {
         UUID userId = UUID.randomUUID();
         LocalDate dueDate = LocalDate.now();
 
-        Todo todo = new Todo(id, "Buy Milk", "2 cartons", false, dueDate, userId);
+        Todo todo = new Todo(id, "Buy Milk", false, dueDate, userId);
 
         assertThat(todo.getId()).isEqualTo(id);
-        assertThat(todo.getTitle()).isEqualTo("Buy Milk");
-        assertThat(todo.getDescription()).isEqualTo("2 cartons");
+        assertThat(todo.getDescription()).isEqualTo("Buy Milk");
         assertThat(todo.isCompleted()).isFalse();
         assertThat(todo.getDueDate()).isEqualTo(dueDate);
         assertThat(todo.getUserId()).isEqualTo(userId);
@@ -28,22 +27,22 @@ class TodoTest {
 
     @Test
     void constructor_withNullId_shouldThrowException() {
-        assertThatThrownBy(() -> new Todo(null, "Title", "Desc", false, LocalDate.now(), UUID.randomUUID()))
+        assertThatThrownBy(() -> new Todo(null, "Desc", false, LocalDate.now(), UUID.randomUUID()))
                 .isInstanceOf(NullPointerException.class);
     }
 
     @Test
-    void constructor_withBlankTitle_shouldThrowException() {
-        assertThatThrownBy(() -> new Todo(UUID.randomUUID(), "", "Desc", false, LocalDate.now(), UUID.randomUUID()))
+    void constructor_withBlankDescription_shouldThrowException() {
+        assertThatThrownBy(() -> new Todo(UUID.randomUUID(), "", false, LocalDate.now(), UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Todo title cannot be null or blank");
+                .hasMessageContaining("Todo description cannot be null or blank");
     }
 
     @Test
     void complete_shouldReturnNewCompletedInstance() {
         UUID id = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        Todo todo = new Todo(id, "Title", "Desc", false, LocalDate.now(), userId);
+        Todo todo = new Todo(id, "Desc", false, LocalDate.now(), userId);
 
         Todo completedTodo = todo.complete();
 
@@ -56,15 +55,14 @@ class TodoTest {
     void update_shouldReturnNewUpdatedInstance() {
         UUID id = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        Todo todo = new Todo(id, "Original Title", "Original Desc", false, LocalDate.now(), userId);
+        Todo todo = new Todo(id, "Original Desc", false, LocalDate.now(), userId);
 
         LocalDate newDueDate = LocalDate.now().plusDays(5);
-        Todo updatedTodo = todo.update("New Title", "New Desc", newDueDate, true);
+        Todo updatedTodo = todo.update("New Desc", newDueDate, true);
 
-        assertThat(updatedTodo.getTitle()).isEqualTo("New Title");
         assertThat(updatedTodo.getDescription()).isEqualTo("New Desc");
         assertThat(updatedTodo.getDueDate()).isEqualTo(newDueDate);
         assertThat(updatedTodo.isCompleted()).isTrue();
-        assertThat(todo.getTitle()).isEqualTo("Original Title"); // original remains unchanged
+        assertThat(todo.getDescription()).isEqualTo("Original Desc"); // original remains unchanged
     }
 }

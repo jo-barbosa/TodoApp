@@ -7,7 +7,6 @@ import java.util.UUID;
 
 public record TodoResponse(
         UUID id,
-        String title,
         String description,
         boolean completed,
         LocalDate dueDate,
@@ -16,7 +15,6 @@ public record TodoResponse(
     public static TodoResponse fromDomain(Todo todo) {
         return new TodoResponse(
                 todo.getId(),
-                todo.getTitle(),
                 todo.getDescription(),
                 todo.isCompleted(),
                 todo.getDueDate(),

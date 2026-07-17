@@ -25,8 +25,6 @@ public class TodoEntity {
     private UUID id;
 
     @Column(nullable = false)
-    private String title;
-
     private String description;
 
     @Column(nullable = false)

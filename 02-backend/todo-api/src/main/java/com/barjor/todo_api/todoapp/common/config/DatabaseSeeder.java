@@ -37,11 +37,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         log.info("User 1: {} | ID: {} | Email: {}", user1.getName(), user1.getId(), user1.getEmail());
         log.info("User 2: {} | ID: {} | Email: {}", user2.getName(), user2.getId(), user2.getEmail());
 
-        todoService.createTodo(user1.getId(), "Comprar leite", "Comprar meio gordo, 2 pacotes", LocalDate.now());
-        todoService.createTodo(user1.getId(), "Estudar Spring Boot e React", "Aprofundar conhecimentos em arquitetura hexagonal", LocalDate.now().plusDays(1));
+        todoService.createTodo(user1.getId(), "Comprar leite (meio gordo, 2 pacotes)", LocalDate.now());
+        todoService.createTodo(user1.getId(), "Estudar Spring Boot e React (Arquitetura Hexagonal)", LocalDate.now().plusDays(1));
 
-        todoService.createTodo(user2.getId(), "Marcar consulta médica", "Consulta de rotina no dentista", LocalDate.now().plusWeeks(1));
-        todoService.createTodo(user2.getId(), "Limpar o escritório", "Organizar a secretária e os livros", LocalDate.now());
+        todoService.createTodo(user2.getId(), "Marcar consulta no dentista (consulta de rotina)", LocalDate.now().plusWeeks(1));
+        todoService.createTodo(user2.getId(), "Limpar o escritório (organizar secretária e livros)", LocalDate.now());
 
         log.info("Mock Todos Seeded successfully!");
         log.info("--------------------------------------------------");

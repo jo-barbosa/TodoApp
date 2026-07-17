@@ -6,20 +6,18 @@ import java.util.UUID;
 
 public final class Todo {
     private final UUID id;
-    private final String title;
     private final String description;
     private final boolean completed;
     private final LocalDate dueDate;
     private final UUID userId;
 
-    public Todo(UUID id, String title, String description, boolean completed, LocalDate dueDate, UUID userId) {
+    public Todo(UUID id, String description, boolean completed, LocalDate dueDate, UUID userId) {
         this.id = Objects.requireNonNull(id, "Todo ID cannot be null");
         this.userId = Objects.requireNonNull(userId, "UserId cannot be null");
         
-        if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Todo title cannot be null or blank");
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("Todo description cannot be null or blank");
         }
-        this.title = title;
         this.description = description;
         this.completed = completed;
         this.dueDate = dueDate;
@@ -27,10 +25,6 @@ public final class Todo {
 
     public UUID getId() {
         return id;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public String getDescription() {
@@ -50,15 +44,15 @@ public final class Todo {
     }
 
     public Todo complete() {
-        return new Todo(id, title, description, true, dueDate, userId);
+        return new Todo(id, description, true, dueDate, userId);
     }
 
     public Todo uncomplete() {
-        return new Todo(id, title, description, false, dueDate, userId);
+        return new Todo(id, description, false, dueDate, userId);
     }
 
-    public Todo update(String newTitle, String newDescription, LocalDate newDueDate, boolean completed) {
-        return new Todo(id, newTitle, newDescription, completed, newDueDate, userId);
+    public Todo update(String newDescription, LocalDate newDueDate, boolean completed) {
+        return new Todo(id, newDescription, completed, newDueDate, userId);
     }
 
     @Override

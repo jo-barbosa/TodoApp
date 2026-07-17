@@ -15,9 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class UpdateTodoRequest {
 
-    @NotBlank(message = "Title is required")
-    private String title;
-
+    @NotBlank(message = "Description is required")
     private String description;
 
     @NotNull(message = "Completed status is required")

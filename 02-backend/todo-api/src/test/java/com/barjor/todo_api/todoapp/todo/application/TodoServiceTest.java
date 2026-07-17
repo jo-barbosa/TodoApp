@@ -43,7 +43,7 @@ class TodoServiceTest {
         UUID userId = UUID.randomUUID();
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> todoService.createTodo(userId, "Title", "Desc", LocalDate.now()))
+        assertThatThrownBy(() -> todoService.createTodo(userId, "Desc", LocalDate.now()))
                 .isInstanceOf(UserNotFoundException.class);
 
         verify(todoRepository, never()).save(any());
@@ -55,13 +55,13 @@ class TodoServiceTest {
         User mockUser = new User(userId, "John", "john@example.com");
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
-        Todo mockSavedTodo = new Todo(UUID.randomUUID(), "Title", "Desc", false, LocalDate.now(), userId);
+        Todo mockSavedTodo = new Todo(UUID.randomUUID(), "Desc", false, LocalDate.now(), userId);
         when(todoRepository.save(any(Todo.class))).thenReturn(mockSavedTodo);
 
-        Todo result = todoService.createTodo(userId, "Title", "Desc", LocalDate.now());
+        Todo result = todoService.createTodo(userId, "Desc", LocalDate.now());
 
         assertThat(result).isNotNull();
-        assertThat(result.getTitle()).isEqualTo("Title");
+        assertThat(result.getDescription()).isEqualTo("Desc");
         assertThat(result.getUserId()).isEqualTo(userId);
         verify(todoRepository, times(1)).save(any(Todo.class));
     }
@@ -73,7 +73,7 @@ class TodoServiceTest {
         UUID todoId = UUID.randomUUID();
 
         User mockUser = new User(userId, "John", "john@example.com");
-        Todo mockTodo = new Todo(todoId, "Title", "Desc", false, LocalDate.now(), otherUserId);
+        Todo mockTodo = new Todo(todoId, "Desc", false, LocalDate.now(), otherUserId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(todoRepository.findById(todoId)).thenReturn(Optional.of(mockTodo));

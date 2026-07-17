@@ -28,7 +28,7 @@ public class TodoController {
             @PathVariable UUID userId,
             @Valid @RequestBody CreateTodoRequest request
     ) {
-        Todo todo = todoService.createTodo(userId, request.getTitle(), request.getDescription(), request.getDueDate());
+        Todo todo = todoService.createTodo(userId, request.getDescription(), request.getDueDate());
         return ResponseEntity.status(HttpStatus.CREATED).body(TodoResponse.fromDomain(todo));
     }
 
@@ -58,7 +58,6 @@ public class TodoController {
         Todo todo = todoService.updateTodo(
                 todoId,
                 userId,
-                request.getTitle(),
                 request.getDescription(),
                 request.getDueDate(),
                 request.getCompleted()

@@ -22,9 +22,9 @@ public class TodoService {
         this.userRepository = userRepository;
     }
 
-    public Todo createTodo(UUID userId, String title, String description, LocalDate dueDate) {
+    public Todo createTodo(UUID userId, String description, LocalDate dueDate) {
         verifyUserExists(userId);
-        Todo todo = new Todo(UUID.randomUUID(), title, description, false, dueDate, userId);
+        Todo todo = new Todo(UUID.randomUUID(), description, false, dueDate, userId);
         return todoRepository.save(todo);
     }
 
@@ -44,7 +44,7 @@ public class TodoService {
         return todo;
     }
 
-    public Todo updateTodo(UUID todoId, UUID userId, String title, String description, LocalDate dueDate, boolean completed) {
+    public Todo updateTodo(UUID todoId, UUID userId, String description, LocalDate dueDate, boolean completed) {
         verifyUserExists(userId);
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new TodoNotFoundException(todoId));
@@ -53,7 +53,7 @@ public class TodoService {
             throw new TodoNotOwnedByUserException(todoId, userId);
         }
 
-        Todo updatedTodo = todo.update(title, description, dueDate, completed);
+        Todo updatedTodo = todo.update(description, dueDate, completed);
         return todoRepository.save(updatedTodo);
     }
 
